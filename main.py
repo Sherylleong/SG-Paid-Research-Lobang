@@ -47,7 +47,7 @@ if not client.is_user_authorized():
 
 
 accepted_words = ['paynow', 'paylah', 'sgd', 'fairprice',
-                  'ntuc', 'grab', 'grabride']  # words indicating money or vouchers
+                  'ntuc', 'grab', 'grabride', 'capitaland']  # words indicating money or vouchers
 rejected_words = [
     'grabfood', 'starbucks'
     ]  # not interested
@@ -85,7 +85,7 @@ def filter(msg):
 @client.on(events.NewMessage(chats=['@paidstudiesNTU', '@SGResearchLobang']))
 async def handler(event):
     if filter(event.raw_text):  # check if the message passes filters
-        await client.forward_messages('@ntuactualpaidstudies', event.message) # channel i set up to forward the messages
+        await client.forward_messages('@sgpaidresearchlobang', event.message) # channel i set up to forward the messages
     else:
         await client.send_message(entity='@testestseask', message="test") # test channel
 #-1038947175
