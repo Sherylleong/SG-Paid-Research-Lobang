@@ -14,23 +14,28 @@ from telethon import utils
 from telethon.tl import functions, types
 
 import re
-import json
+import os
 
-# enter own details in json file (api id and hash can be obtained from Telegram developer tools website)
-with open("info.json", "r") as f:
-    json_data = json.load(f)
+from telethon.sessions import StringSession
 
-api_id = json_data['api_id']
-api_hash = json_data['api_hash']
-phone = json_data['phone']
-username = json_data['username']
+
+
+# retrieve environment variables from heroku
+api_id = os.getenv('API_ID')
+api_hash = os.getenv('API_HASH')
+phone = os.getenv('PHONE')
+username = os.getenv('USERNAME')
+session_string = os.getenv('SESSION_STRING')
+
 
 # Create the client and connect
 #client = TelegramClient(None, username, api_id, api_hash)
-client = TelegramClient('anon', api_id, api_hash)
+client = TelegramClient(StringSession(session_string), api_id, api_hash)
+
 client.start()
 print("Client Created")
 
+print(client.session.save())
 # Ensure you're authorized
 if not client.is_user_authorized():
     client.send_code_request(phone)
@@ -39,12 +44,14 @@ if not client.is_user_authorized():
     except SessionPasswordNeededError:
         client.sign_in(password=input('Password: '))
 
+
+
 accepted_words = ['paynow', 'paylah', 'sgd', 'fairprice',
-                  'ntuc']  # words indicating money or grocery vouchers
+                  'ntuc', 'grab', 'grabride']  # words indicating money or vouchers
 rejected_words = [
-    'chance', 'lucky', 'grab', 'grabfood', 'grabride', 'starbucks', 'nus'
-    ]  # words indicating chance, vouchers or exclusions
-pr = ['pr', 'permanent', 'resident'] # open to PRs
+    'grabfood', 'starbucks'
+    ]  # not interested
+pr = ['pr', 'permanent', 'resident', 'residing', 'foreign', 'nationalities'] # open to PRs
 citizen = ['singaporean', 'singaporeans', 'citizens', 'citizen'] # open to citizens
 
 def filterpr(msg):
@@ -79,6 +86,8 @@ def filter(msg):
 async def handler(event):
     if filter(event.raw_text):  # check if the message passes filters
         await client.forward_messages('@ntuactualpaidstudies', event.message) # channel i set up to forward the messages
+    else:
+        await client.send_message(entity='@testestseask', message="test") # test channel
 #-1038947175
 
 client.run_until_disconnected()
