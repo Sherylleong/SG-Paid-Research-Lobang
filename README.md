@@ -1,4 +1,2 @@
 # SG-Paid-Research-Lobang
-Utilises Telethon library with own user account to extract messages from the SG Research Lobang and NTU Paid Studies Telegram channels, filtering for those that have guaranteed cash/voucher rewards and can be participated by all nationalities. 
-
-WIP: Will need to try hosting somewhere and see if it can run continuously without disconnecting.
+Utilises Telethon userbot to extract messages from the SG Research Lobang and NTU Paid Studies/Surveys Telegram channels and forward them to my own channel, SG Paid Research Lobang. Studies are filtered for those that have cash/voucher rewards and that can be participated in by other nationalities. Hosted on Heroku.
