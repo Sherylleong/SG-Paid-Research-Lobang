@@ -29,13 +29,12 @@ session_string = os.getenv('SESSION_STRING')
 
 
 # Create the client and connect
-#client = TelegramClient(None, username, api_id, api_hash)
-client = TelegramClient(StringSession(session_string), api_id, api_hash)
+client = TelegramClient(StringSession(), api_id, api_hash)
+
 
 client.start()
-print("Client Created")
-
 print(client.session.save())
+print("Client Created")
 # Ensure you're authorized
 if not client.is_user_authorized():
     client.send_code_request(phone)
@@ -47,16 +46,17 @@ if not client.is_user_authorized():
 
 
 accepted_words = ['paynow', 'paylah', 'sgd', 'fairprice',
-                  'ntuc', 'grab', 'grabride', 'capitaland']  # words indicating money or vouchers
+                  'ntuc', 'grab', 'grabride', 'capitaland', 'dollar']  # words indicating money or vouchers
 rejected_words = [
-    'grabfood', 'starbucks'
+    'grabfood'
     ]  # not interested
-pr = ['pr', 'permanent', 'resident', 'residing', 'foreign', 'nationalities'] # open to PRs
+other = ['pr', 'permanent', 'resident', 'residing', 'foreign', 'nationalities', 'everyone'] # open to others
 citizen = ['singaporean', 'singaporeans', 'citizens', 'citizen'] # open to citizens
+dollar = ['$', 'sgd']
 
-def filterpr(msg):
+def filterother(msg):
     msg_words = [word.lower() for word in msg.split()]
-    for word in pr: # open to prs
+    for word in other: # open to prs
         if (word in msg_words):
             return True
     for word in citizen: # open to citizens only
@@ -64,23 +64,29 @@ def filterpr(msg):
             return False
     return True # no mention, probably open to everyone
 
-def filter(msg):
-    dollarsign = re.search("\$", msg)  # if msg contains $
+def filterdollar(msg):
+    for word in dollar:
+        if re.search(word, msg) != None:
+            return True
 
+
+
+def filter(msg):
     msg_words = [word.lower() for word in msg.split()]
 
-    for word in rejected_words:  # probably lucky draw or grab vouchers
+    for word in rejected_words:  
         if (word in msg_words):
             return False
-    if not filterpr(msg):
+    if not filterother(msg):
         return False
-    if (dollarsign != None):  # probably money
+    if filterdollar(msg.lower()):  # probably money
         return True
     for word in accepted_words:  # probably money or grocery vouchers
         if (word in msg_words):
             return True
     return False
 
+print(filter("$sdasjkd"))
 
 @client.on(events.NewMessage(chats=['@paidstudiesNTU', '@SGResearchLobang']))
 async def handler(event):
