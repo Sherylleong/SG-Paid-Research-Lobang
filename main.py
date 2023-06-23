@@ -29,7 +29,7 @@ session_string = os.getenv('SESSION_STRING')
 
 
 # Create the client and connect
-client = TelegramClient(StringSession(), api_id, api_hash)
+client = TelegramClient(StringSession(session_string), api_id, api_hash)
 
 
 client.start()
