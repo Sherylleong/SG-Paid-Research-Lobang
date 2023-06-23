@@ -86,11 +86,11 @@ def filter(msg):
             return True
     return False
 
-print(filter("$sdasjkd"))
 
 @client.on(events.NewMessage(chats=['@paidstudiesNTU', '@SGResearchLobang']))
 async def handler(event):
-    if filter(event.raw_text):  # check if the message passes filters
+    processed_text = re.sub(r'[^\w\s]', '', event.raw_text).lower() # remove punctuation
+    if filter(processed_text):  # check if the message passes filters
         await client.forward_messages('@sgpaidresearchlobang', event.message) # channel i set up to forward the messages
     else:
         await client.send_message(entity='@testestseask', message="test") # test channel
