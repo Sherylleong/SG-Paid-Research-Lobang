@@ -52,7 +52,7 @@ rejected_words = [
     ]  # not interested
 other = ['pr', 'permanent', 'resident', 'residing', 'foreign', 'nationalities', 'everyone'] # open to others
 citizen = ['singaporean', 'singaporeans', 'citizens', 'citizen'] # open to citizens
-dollar = ['$', 'sgd']
+dollar = ['\$', 'sgd']
 
 def filterother(msg):
     msg_words = [word.lower() for word in msg.split()]
