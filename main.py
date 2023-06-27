@@ -15,6 +15,7 @@ from telethon.tl import functions, types
 
 import re
 import os
+import string
 
 from telethon.sessions import StringSession
 
@@ -46,13 +47,12 @@ if not client.is_user_authorized():
 
 
 accepted_words = ['paynow', 'paylah', 'sgd', 'fairprice',
-                  'ntuc', 'grab', 'grabride', 'capitaland', 'dollar']  # words indicating money or vouchers
+                  'ntuc', 'grab', 'grabride', 'capitaland', 'dollar', 'sgd']  # words indicating money or vouchers
 rejected_words = [
     'grabfood'
     ]  # not interested
 other = ['pr', 'permanent', 'resident', 'residing', 'foreign', 'nationalities', 'everyone'] # open to others
 citizen = ['singaporean', 'singaporeans', 'citizens', 'citizen'] # open to citizens
-dollar = ['\$', 'sgd']
 
 def filterother(msg):
     msg_words = [word.lower() for word in msg.split()]
@@ -64,36 +64,34 @@ def filterother(msg):
             return False
     return True # no mention, probably open to everyone
 
-def filterdollar(msg):
-    for word in dollar:
-        if re.search(word, msg) != None:
-            return True
-
+def filtermoney(msg):
+    if re.search("\$", msg):
+        return True
+    return False
 
 
 def filter(msg):
-    msg_words = [word.lower() for word in msg.split()]
-
+    pro_msg = msg.translate(str.maketrans('', '', string.punctuation)).lower()
+    # pro_msg = re.sub(r'[^\w\s]', '', msg).lower()
+    msg_words = pro_msg.split()
     for word in rejected_words:  
         if (word in msg_words):
             return False
     if not filterother(msg):
         return False
-    if filterdollar(msg.lower()):  # probably money
+    if filtermoney(msg):  # probably money
         return True
     for word in accepted_words:  # probably money or grocery vouchers
         if (word in msg_words):
             return True
     return False
 
-
 @client.on(events.NewMessage(chats=['@paidstudiesNTU', '@SGResearchLobang']))
 async def handler(event):
-    processed_text = re.sub(r'[^\w\s]', '', event.raw_text).lower() # remove punctuation
-    if filter(processed_text):  # check if the message passes filters
+    if filter(event.raw_text):  # check if the message passes filters
         await client.forward_messages('@sgpaidresearchlobang', event.message) # channel i set up to forward the messages
     else:
-        await client.send_message(entity='@testestseask', message="test") # test channel
+        await client.send_message(entity='@testestseask', message=event.message) # test channel
 #-1038947175
 
 client.run_until_disconnected()
