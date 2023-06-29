@@ -69,23 +69,34 @@ def filtermoney(msg):
         return True
     return False
 
-
-def filter(msg):
-    pro_msg = msg.translate(str.maketrans('', '', string.punctuation)).lower()
-    # pro_msg = re.sub(r'[^\w\s]', '', msg).lower()
-    msg_words = pro_msg.split()
+def filterkeywords(msg):
+    msg_words = [word.lower() for word in msg.split()]
     for word in rejected_words:  
         if (word in msg_words):
             return False
-    if not filterother(msg):
-        return False
-    if filtermoney(msg):  # probably money
-        return True
-    for word in accepted_words:  # probably money or grocery vouchers
+    for word in accepted_words: # probably money or grocery vouchers
         if (word in msg_words):
             return True
     return False
 
+def filter(msg):
+    pro_msg = msg.translate(str.maketrans('', '', string.punctuation)).lower()
+    requirement_text = msg.split("Requirements:")[1].split("Reward:")[0]
+    reward_text = msg.split("Reward:")[1].split("Participate:")[0]
+    duration_text = msg.split("Duration:")[1].split("Requirements:")[0]
+
+    msg_words = pro_msg.split()
+
+
+    if not filterother(requirement_text):
+        return False
+    if filterkeywords:
+        return True
+    if filtermoney(reward_text):  # probably money
+        return True
+    if filterkeywords(reward_text):
+        return True
+    return False
 @client.on(events.NewMessage(chats=['@paidstudiesNTU', '@SGResearchLobang']))
 async def handler(event):
     if filter(event.raw_text):  # check if the message passes filters
