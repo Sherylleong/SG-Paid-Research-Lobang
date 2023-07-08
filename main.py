@@ -90,6 +90,8 @@ def filter(msg):
 
     if not filterother(requirement_text):
         return False
+    if filterkeywords:
+        return True
     if filtermoney(reward_text):  # probably money
         return True
     if filterkeywords(reward_text):
