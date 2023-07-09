@@ -79,9 +79,19 @@ def filterkeywords(msg):
     return False
 
 def filter(msg):
-    requirement_text = msg.split("Requirements:")[1].split("Reward:")[0]
-    reward_text = msg.split("Reward:")[1].split("Participate:")[0]
-    duration_text = msg.split("Duration:")[1].split("Requirements:")[0]
+    msg = msg.replace('\n', ' ').replace('\r', '')
+    requirement_text = re.search('Requirements:(.*)Reward:', msg)
+    if requirement_text is not None:
+        requirement_text = requirement_text.group(1)
+    else: 
+        requirement_text = msg
+
+    reward_text = re.search(r'Reward:(.*?)Participate:', msg)
+    if reward_text is not None:
+        reward_text = reward_text.group(1)
+    else: 
+        reward_text = msg
+    # duration_text = msg.split("Duration:")[1].split("Requirements:")[0]
 
     if not filterother(requirement_text):
         return False
@@ -90,6 +100,7 @@ def filter(msg):
     if filterkeywords(reward_text):
         return True
     return False
+
 @client.on(events.NewMessage(chats=['@paidstudiesNTU', '@SGResearchLobang']))
 async def handler(event):
     if filter(event.raw_text):  # check if the message passes filters
