@@ -34,10 +34,7 @@ client = TelegramClient(StringSession(session_string), api_id, api_hash)
 
 client.start()
 print(client.session.save())
-
-entity=client.get_entity(username)
-client.send_message(entity=entity,message="Up") # Ensure bot is up
-
+print("Client Created")
 # Ensure you're authorized
 if not client.is_user_authorized():
     client.send_code_request(phone)
