@@ -63,7 +63,7 @@ def filterother(msg):
     return True # no mention, probably open to everyone
 
 def filtermoney(msg):
-    if re.search("\$", msg) or re.search("sgd", msg):
+    if re.search("\$", msg) or re.search("sgd|SGD", msg):
         return True
     return False
 
