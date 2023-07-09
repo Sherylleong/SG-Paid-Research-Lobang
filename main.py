@@ -21,13 +21,12 @@ from telethon.sessions import StringSession
 
 
 
-# retrieve environment variables from heroku
+# retrieve environment variables from heroku getenv
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 phone = os.getenv('PHONE')
 username = os.getenv('USERNAME')
 session_string = os.getenv('SESSION_STRING')
-
 
 # Create the client and connect
 client = TelegramClient(StringSession(session_string), api_id, api_hash)
@@ -44,10 +43,8 @@ if not client.is_user_authorized():
     except SessionPasswordNeededError:
         client.sign_in(password=input('Password: '))
 
-
-
-accepted_words = ['paynow', 'paylah', 'sgd', 'fairprice',
-                  'ntuc', 'grab', 'grabride', 'capitaland', 'dollar', 'sgd']  # words indicating money or vouchers
+accepted_words = ['paynow', 'paylah', 'fairprice',
+                  'ntuc', 'grab', 'grabride', 'capitaland', 'dollar', 'dollars']  # words indicating money or vouchers
 rejected_words = [
     'grabfood'
     ]  # not interested
@@ -55,7 +52,8 @@ other = ['pr', 'permanent', 'resident', 'residing', 'foreign', 'nationalities', 
 citizen = ['singaporean', 'singaporeans', 'citizens', 'citizen'] # open to citizens
 
 def filterother(msg):
-    msg_words = [word.lower() for word in msg.split()]
+    pro_msg = msg.translate(str.maketrans('', '', string.punctuation))
+    msg_words = [word.lower() for word in pro_msg.split()]
     for word in other: # open to prs
         if (word in msg_words):
             return True
@@ -65,12 +63,13 @@ def filterother(msg):
     return True # no mention, probably open to everyone
 
 def filtermoney(msg):
-    if re.search("\$", msg):
+    if re.search("\$", msg) or re.search("sgd", msg):
         return True
     return False
 
 def filterkeywords(msg):
-    msg_words = [word.lower() for word in msg.split()]
+    pro_msg = msg.translate(str.maketrans('', '', string.punctuation))
+    msg_words = [word.lower() for word in pro_msg.split()]
     for word in rejected_words:  
         if (word in msg_words):
             return False
@@ -80,18 +79,12 @@ def filterkeywords(msg):
     return False
 
 def filter(msg):
-    pro_msg = msg.translate(str.maketrans('', '', string.punctuation)).lower()
     requirement_text = msg.split("Requirements:")[1].split("Reward:")[0]
     reward_text = msg.split("Reward:")[1].split("Participate:")[0]
     duration_text = msg.split("Duration:")[1].split("Requirements:")[0]
 
-    msg_words = pro_msg.split()
-
-
     if not filterother(requirement_text):
         return False
-    if filterkeywords:
-        return True
     if filtermoney(reward_text):  # probably money
         return True
     if filterkeywords(reward_text):
