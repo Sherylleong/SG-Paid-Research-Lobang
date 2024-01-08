@@ -21,7 +21,8 @@ from dotenv import load_dotenv
 from telethon.sessions import StringSession
 
 
-load_dotenv()
+# load_dotenv() comment when deploying with heroku
+
 # retrieve environment variables from heroku getenv
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
