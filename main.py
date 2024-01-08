@@ -16,11 +16,12 @@ from telethon.tl import functions, types
 import re
 import os
 import string
+from dotenv import load_dotenv
 
 from telethon.sessions import StringSession
 
 
-
+load_dotenv()
 # retrieve environment variables from heroku getenv
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
@@ -35,6 +36,7 @@ client = TelegramClient(StringSession(session_string), api_id, api_hash)
 client.start()
 print(client.session.save())
 print("Client Created")
+
 # Ensure you're authorized
 if not client.is_user_authorized():
     client.send_code_request(phone)
@@ -43,7 +45,7 @@ if not client.is_user_authorized():
     except SessionPasswordNeededError:
         client.sign_in(password=input('Password: '))
 
-accepted_words = ['paynow', 'paylah', 'fairprice',
+accepted_words = ['paynow', 'paylah', 'fairprice', 'sgd',
                   'ntuc', 'grab', 'grabride', 'capitaland', 'dollar', 'dollars']  # words indicating money or vouchers
 rejected_words = [
     'grabfood'
@@ -52,7 +54,7 @@ other = ['pr', 'permanent', 'resident', 'residing', 'foreign', 'nationalities', 
 citizen = ['singaporean', 'singaporeans', 'citizens', 'citizen'] # open to citizens
 
 def filterother(msg):
-    pro_msg = msg.translate(str.maketrans('', '', string.punctuation))
+    pro_msg = re.sub("\W", " ", msg).lower()
     msg_words = [word.lower() for word in pro_msg.split()]
     for word in other: # open to prs
         if (word in msg_words):
@@ -63,20 +65,19 @@ def filterother(msg):
     return True # no mention, probably open to everyone
 
 def filtermoney(msg):
-    if re.search("\$", msg) or re.search("sgd|SGD", msg):
+    if re.search("\$", msg):
         return True
     return False
 
 def filterkeywords(msg):
-    pro_msg = msg.translate(str.maketrans('', '', string.punctuation))
-    msg_words = [word.lower() for word in pro_msg.split()]
+    pro_msg = re.sub("\W", " ", msg).lower()
     for word in rejected_words:  
-        if (word in msg_words):
+        if re.search(word, pro_msg):
             return False
     for word in accepted_words: # probably money or grocery vouchers
-        if (word in msg_words):
+        if re.search(word, pro_msg):
             return True
-    return False
+    return 
 
 def filter(msg):
     msg = msg.replace('\n', ' ').replace('\r', '')
@@ -108,5 +109,8 @@ async def handler(event):
     else:
         await client.send_message(entity='@testestseask', message=event.message) # test channel
 #-1038947175
-
+@client.on(events.NewMessage(chats=['@testestseask']))
+async def tester(event):
+        await client.send_message(entity='@testestseask', message='up') # test bot is up using test channel
+#-1038947175
 client.run_until_disconnected()
