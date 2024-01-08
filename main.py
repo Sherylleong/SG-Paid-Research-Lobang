@@ -16,12 +16,12 @@ from telethon.tl import functions, types
 import re
 import os
 import string
-from dotenv import load_dotenv
+
 
 from telethon.sessions import StringSession
 
-
-# load_dotenv() comment when deploying with heroku
+#from dotenv import load_dotenv #comment when deploying with heroku
+#load_dotenv() #comment when deploying with heroku
 
 # retrieve environment variables from heroku getenv
 api_id = os.getenv('API_ID')
