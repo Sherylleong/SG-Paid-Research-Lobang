@@ -20,8 +20,8 @@ import string
 
 from telethon.sessions import StringSession
 
-#from dotenv import load_dotenv #comment when deploying with heroku
-#load_dotenv() #comment when deploying with heroku
+from dotenv import load_dotenv #comment when deploying with heroku
+load_dotenv() #comment when deploying with heroku
 
 # retrieve environment variables from heroku getenv
 api_id = os.getenv('API_ID')

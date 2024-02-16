@@ -1,0 +1,22 @@
+runtime: python39
+api_version: 1
+threadsafe: true
+
+
+# [START handlers]
+handlers:
+# Telegram web hook URLs
+- url: /TG.*
+  script: main.app
+# Other URLs - allowed only for gcloud project admins (Google login)
+- url: /.*
+  script: main.app
+  login: admin
+
+
+env_variables:
+  API_ID: ${API_ID}
+  API_HASH: ${API_HASH}
+  USERNAME: ${USERNAME}
+  PHONE: ${PHONE}
+  SESSION_STRING: ${SESSION_STRING}
