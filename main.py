@@ -88,9 +88,9 @@ def filter(msg):
     else: 
         requirement_text = msg
 
-    reward_text = re.search(r'Reward:(.*?)Participate:', msg)
+    reward_text = re.search(r'(Reward|Compensation):(.*?)Participate:', msg)
     if reward_text is not None:
-        reward_text = reward_text.group(1)
+        reward_text = reward_text.group(2)
     else: 
         reward_text = msg
     # duration_text = msg.split("Duration:")[1].split("Requirements:")[0]
